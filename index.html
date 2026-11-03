@@ -204,7 +204,7 @@ function render(){
  r.sort((a,b)=>(st.sort==='desc'?-1:1)*a.date.localeCompare(b.date)||a.id.localeCompare(b.id));
  $('#mylist').classList.toggle('on',st.view==='mine');
  let bn='';
- if(st.view==='mine')bn=`<div class="banner"><div class="bt">★ 我的清單（${pool.length} 則）<small>收藏只存在這個瀏覽器裡；分享清單會產生一個連結給同事。</small></div>${pool.length?'<button class="btn pri" id="shareList">分享清單</button>':''}<button class="btn" id="backAll">← 回到全部案例</button></div>`;
+ if(st.view==='mine')bn=`<div class="banner"><div class="bt">★ 我的清單（${pool.length} 則）<small>收藏只存在這個瀏覽器裡；分享清單會產生一個連結給同事。</small></div>${pool.length?'<button class="btn pri" id="shareList">分享清單</button>':''}${fav.length?'<button class="btn" id="clearFav">清除全部</button>':''}<button class="btn" id="backAll">← 回到全部案例</button></div>`;
  if(st.view==='shared'){const add=shared.filter(id=>!isFav(id)).length;bn=`<div class="banner"><div class="bt">同事分享的清單（${pool.length} 則）<small>這是別人分享的清單，不會改動你的收藏。</small></div>${pool.length?`<button class="btn pri" id="addAll" ${add?'':'disabled style="opacity:.5;cursor:default"'}>${add?'全部加入我的清單':'已全部在我的清單'}</button>`:''}<button class="btn" id="backAll">← 回到全部案例</button></div>`}
  $('#banner').innerHTML=bn;
  const filtered=r.length!==pool.length;
@@ -224,7 +224,8 @@ function render(){
 $('#banner').onclick=e=>{
  if(e.target.closest('#backAll'))goAll();
  else if(e.target.closest('#shareList')){const ids=C.filter(c=>isFav(c.id)).sort((a,b)=>a.id.localeCompare(b.id)).map(c=>c.id);copy(baseUrl()+'#list='+ids.join(','),'已複製清單連結')}
- else if(e.target.closest('#addAll')){const n=shared.filter(id=>!isFav(id));fav=[...fav,...n];saveFav();toast(`已加入 ${n.length} 則到我的清單`);render()}};
+ else if(e.target.closest('#addAll')){const n=shared.filter(id=>!isFav(id));fav=[...fav,...n];saveFav();toast(`已加入 ${n.length} 則到我的清單`);render()}
+ else if(e.target.closest('#clearFav')){if(confirm(`確定要清除我的清單裡全部 ${fav.length} 則案例嗎？`)){fav=[];saveFav();document.querySelectorAll('.star.on').forEach(x=>{x.classList.remove('on');x.textContent='☆';x.title='加入我的清單'});toast('已清除我的清單');render()}}};
 function goAll(){st.view='all';shared=[];if(location.hash)history.pushState(null,'',baseUrl());render()}
 $('#mylist').onclick=()=>{if(st.view==='mine'){goAll();return}st.view='mine';shared=[];if(location.hash.startsWith('#list='))history.pushState(null,'',baseUrl());render();scrollTo({top:$('main').offsetTop-10,behavior:'smooth'})};
 // ---- 相似案例 ----
